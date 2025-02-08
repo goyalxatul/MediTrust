@@ -7,16 +7,12 @@ const Signout = () => {
       className="flex justify-start items-center h-screen w-full bg-cover bg-center px-16"
       style={{ backgroundImage: "url('/e.avif')" }}
     >
-      {/* Main Container */}
-      <div className="bg-white-100 shadow-xl rounded-2xl p-8 text-left text-white max-w-md w-full">
-        {/* Icon */}
-        <FaSignOutAlt className="text-6xl text-blue-400" />
 
-        {/* Title & Subtitle */}
+      <div className="bg-white-100 shadow-xl rounded-2xl p-8 text-left text-white max-w-md w-full">
+        <FaSignOutAlt className="text-6xl text-blue-400" />
         <h2 className="text-3xl font-semibold mt-4">Welcome to Cryptify</h2>
         <p className="text-gray-300">Dive into the World of Safe Share.</p>
 
-        {/* Authentication Section */}
         <SignedOut>
           <div className="p-6 rounded-lg mt-4">
             <SignInButton className="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition">
