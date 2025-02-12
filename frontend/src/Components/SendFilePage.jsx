@@ -1,122 +1,154 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { FiCopy } from "react-icons/fi";
+import { AiOutlineFile } from "react-icons/ai";
+import CryptoJS from "crypto-js";
+import axios from "axios";
 
 const SendFile = () => {
   const [file, setFile] = useState(null);
-  const [email, setEmail] = useState("");
+  const [encryptedFile, setEncryptedFile] = useState(null);
   const [password, setPassword] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [success, setSuccess] = useState("");
+  const fileInputRef = useRef(null);
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-  };
-
-  const handleCopyPassword = () => {
-    navigator.clipboard.writeText(password);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleSubmit = (event) => {
+  // Handle Drag and Drop
+  const handleDragOver = (event) => event.preventDefault();
+  const handleDrop = (event) => {
     event.preventDefault();
-    if (!file || !email) {
-      alert("Please upload a file and enter the receiver's email.");
+    handleFileChange(event.dataTransfer.files[0]);
+  };
+
+  const handleFileSelect = () => fileInputRef.current.click();
+
+  const handleFileChange = (selectedFile) => {
+    if (!selectedFile) return;
+
+    if (!password) {
+      setError("Please enter a password before encrypting the file.");
       return;
     }
-    console.log("File:", file);
-    console.log("Receiver Email:", email);
-    console.log("File Password:", password);
-    alert("File uploaded securely!");
+
+    setFile(selectedFile);
+    setError("");
+
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(selectedFile);
+
+    reader.onload = (e) => {
+      const fileData = new Uint8Array(e.target.result);
+      const wordArray = CryptoJS.lib.WordArray.create(fileData);
+
+      // Encrypt the file
+      const encrypted = CryptoJS.AES.encrypt(wordArray, password).toString();
+      const metadata = JSON.stringify({ name: selectedFile.name, type: selectedFile.type });
+
+      const finalData = btoa(unescape(encodeURIComponent(metadata))) + "::" + encrypted;
+      const encryptedBlob = new Blob([finalData], { type: "text/plain" });
+
+      const encryptedUrl = URL.createObjectURL(encryptedBlob);
+      setEncryptedFile(encryptedUrl);
+    };
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      setError("Please select a file to upload.");
+      return;
+    }
+
+    setUploading(true);
+    setProgress(0);
+
+    const formData = new FormData();
+    formData.append("file", file, file.name);
+    formData.append("password", password);
+
+    try {
+      const response = await axios.post("http://localhost:5001/api/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setProgress(percent);
+        },
+      });
+
+      setSuccess(response.data.message);
+      setFile(null);
+      setPassword("");
+    } catch (err) {
+      setError("File upload failed. Please try again.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
     <div className="flex flex-col items-center bg-gray-100 min-h-screen py-10">
-      {/* Page Header */}
       <div className="bg-blue-600 text-white w-full text-center py-6 text-3xl font-bold">
-        Send File Securely
+        Encrypt & Upload File Securely
       </div>
 
-      {/* Upload Section */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white shadow-lg rounded-lg p-6 mt-6 w-full max-w-2xl"
-      >
-        <label
-          htmlFor="file-upload"
-          className="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 p-6 cursor-pointer hover:bg-gray-50 transition"
+      <div className="bg-white shadow-lg rounded-lg p-6 mt-6 w-full max-w-2xl">
+        <div
+          className="border-2 border-dashed border-gray-300 p-10 text-center cursor-pointer hover:border-blue-600 transition"
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          onClick={handleFileSelect}
         >
-          <FaCloudUploadAlt size={50} className="text-blue-500" />
-          <p className="text-gray-600">Click to upload or drag and drop</p>
-          <p className="text-gray-500 text-sm">(Max Size: 10MB)</p>
-          <input
-            type="file"
-            id="file-upload"
-            className="hidden"
-            onChange={handleFileChange}
-            accept=".pdf,.doc,.png,.jpg"
-          />
-        </label>
-        {file && <p className="mt-2 text-green-600">File: {file.name}</p>}
-
-        {/* Receiver's Email */}
-        <div className="mt-4">
-          <label className="text-gray-700 font-medium">Receiver's Email</label>
-          <input
-            type="email"
-            placeholder="Enter Receiver's Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-blue-500 focus:border-blue-500"
-            required
-          />
+          <FaCloudUploadAlt className="text-gray-400 text-5xl mx-auto" />
+          <p className="text-gray-500 mt-2">Drag & drop your file here, or click to browse</p>
         </div>
 
-        {/* Set File Password */}
-        <div className="mt-4 flex items-center gap-2">
-          <div className="w-full">
-            <label className="text-gray-700 font-medium">Set File Password</label>
-            <input
-              type="password"
-              placeholder="Set File Password (Optional)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          {/* Copy Password Button */}
-          {password && (
-            <button
-              type="button"
-              onClick={handleCopyPassword}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg mt-6 flex items-center"
+        <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => handleFileChange(e.target.files[0])} />
+
+        <input
+          type="password"
+          placeholder="Enter password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full border rounded-lg px-3 py-2 mt-4"
+        />
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
+        {uploading && (
+          <div className="w-full bg-gray-200 rounded mt-4">
+            <div
+              className="bg-blue-600 text-xs font-medium text-center p-1 leading-none rounded"
+              style={{ width: `${progress}%` }}
             >
-              <FiCopy className="mr-2" />
-              {copied ? "Copied" : "Copy"}
-            </button>
-          )}
-        </div>
+              {progress}%
+            </div>
+          </div>
+        )}
 
-        {/* Security Notice */}
-        <p className="text-xs text-gray-500 mt-4">
-          🔒 Remember to copy your password and send it to the receiver. Due to
-          security policies, we do not store or send passwords.
-        </p>
+        <button
+          onClick={handleUpload}
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center"
+        >
+          <FaCloudUploadAlt className="mr-2" /> Upload to S3
+        </button>
 
-        {/* Submit & Send Now Button Centered */}
-        <div className="mt-4 flex justify-center">
-          <button
-            type="button"
-            onClick={() => alert("Sending File...")}
-            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg"
-          >
-            Send Now
-          </button>
-        </div>
-      </form>
+        {encryptedFile && (
+          <a href={encryptedFile} download={`${file?.name}.enc`} className="block mt-4 text-blue-600 font-medium">
+            Download Encrypted File
+          </a>
+        )}
+
+        {success && <p className="text-green-600 mt-2">{success}</p>}
+      </div>
     </div>
   );
 };
 
 export default SendFile;
+
+
+
+
+
+
+
 

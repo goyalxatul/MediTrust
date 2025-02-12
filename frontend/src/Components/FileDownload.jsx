@@ -1,61 +1,96 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import CryptoJS from "crypto-js";
 
-const FileDownload = () => {
-  const [fileId, setFileId] = useState("");
+const DecryptFile = () => {
+  const [encryptedFile, setEncryptedFile] = useState(null);
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [decryptedFile, setDecryptedFile] = useState(null);
+  const [error, setError] = useState("");
 
-  const handleDownload = () => {
-    // Implement file download & decryption logic here
-    alert(`Downloading file: ${fileId} with decryption password.`);
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+
+    setEncryptedFile(selectedFile);
+    setError("");
+  };
+
+  const handleDecrypt = () => {
+    if (!encryptedFile || !password) {
+      setError("Please select a file and enter the password.");
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      try {
+        const fileContent = e.target.result;
+        const [metadataBase64, encryptedText] = fileContent.split("::");
+
+        // Decode metadata
+        const metadata = JSON.parse(decodeURIComponent(escape(atob(metadataBase64))));
+        const { name, type } = metadata;
+
+        // Decrypt file data
+        const decrypted = CryptoJS.AES.decrypt(encryptedText, password);
+        const decryptedBytes = decrypted.sigBytes ? decrypted.toString(CryptoJS.enc.Latin1) : null;
+
+        if (!decryptedBytes) {
+          throw new Error("Incorrect password or corrupted file.");
+        }
+
+        // Convert back to original binary format
+        const byteArray = new Uint8Array(decryptedBytes.split("").map((char) => char.charCodeAt(0)));
+        const blob = new Blob([byteArray], { type });
+
+        // Generate download link
+        const url = URL.createObjectURL(blob);
+        setDecryptedFile({ url, name });
+        setError("");
+      } catch (error) {
+        setError("Decryption failed. Ensure the password is correct.");
+      }
+    };
+
+    reader.readAsText(encryptedFile);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center px-4">
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold text-center text-blue-600">
-          File Download & Decrypt
-        </h2>
-        <p className="text-center text-gray-500 text-sm">Secure File Sharing</p>
+    <div className="flex flex-col items-center bg-gray-100 min-h-screen py-10">
+      <div className="bg-red-600 text-white w-full text-center py-6 text-3xl font-bold">
+        Decrypt File Securely
+      </div>
 
-        <div className="mt-4">
-          <label className="block text-gray-600 mb-1">Enter File ID</label>
-          <input
-            type="text"
-            value={fileId}
-            onChange={(e) => setFileId(e.target.value)}
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter File ID"
-          />
-        </div>
-
-        <div className="mt-4 relative">
-          <label className="block text-gray-600 mb-1">Set File Password</label>
-          <input
-            type={showPassword ? "text" : "password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter File Password"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-2 top-9 text-gray-600"
-          >
-            👁️
-          </button>
-        </div>
-
-        <button
-          onClick={handleDownload}
-          className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-300"
-        >
-          DOWNLOAD AND DECRYPT
+      <div className="bg-white shadow-lg rounded-lg p-6 mt-6 w-full max-w-2xl">
+        <input type="file" onChange={handleFileChange} className="mb-4" />
+        <input
+          type="password"
+          placeholder="Enter password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full border rounded-lg px-3 py-2"
+        />
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+        <button onClick={handleDecrypt} className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
+          Decrypt File
         </button>
+
+        {decryptedFile && (
+          <a href={decryptedFile.url} download={decryptedFile.name} className="block mt-4 text-blue-600 font-medium">
+            Download Decrypted File
+          </a>
+        )}
       </div>
     </div>
   );
 };
 
-export default FileDownload;
+export default DecryptFile;
+
+
+
+
+
+
+
