@@ -1,14 +1,14 @@
 import React, { useState, useRef } from "react";
-import { FaCloudUploadAlt } from "react-icons/fa";
+import { FaLockOpen } from "react-icons/fa";
 
-const SendFile = () => {
+const FileDecryption = () => {
   const [file, setFile] = useState(null);
-  const [encryptedFile, setEncryptedFile] = useState(null);
+  const [decryptedFile, setDecryptedFile] = useState(null);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
-  // Generate a cryptographic key from the password
+  // Generate cryptographic key
   const generateKey = async (password) => {
     const encoder = new TextEncoder();
     const keyMaterial = await window.crypto.subtle.importKey(
@@ -29,15 +29,15 @@ const SendFile = () => {
       keyMaterial,
       { name: "AES-GCM", length: 256 },
       false,
-      ["encrypt"]
+      ["decrypt"]
     );
   };
 
-  // Encrypt file
-  const encryptFile = async (selectedFile) => {
+  // Decrypt the file
+  const decryptFile = async (selectedFile) => {
     if (!selectedFile) return;
     if (!password) {
-      setError("Please enter a password before encrypting the file.");
+      setError("Please enter a password to decrypt the file.");
       return;
     }
 
@@ -45,48 +45,52 @@ const SendFile = () => {
     setError("");
 
     const fileBuffer = await selectedFile.arrayBuffer();
-    const key = await generateKey(password);
-    const iv = window.crypto.getRandomValues(new Uint8Array(12)); // 12-byte IV
 
     try {
-      const encryptedData = await window.crypto.subtle.encrypt(
+      // Extract IV (first 12 bytes) and encrypted content
+      const iv = new Uint8Array(fileBuffer.slice(0, 12)); // First 12 bytes = IV
+      const encryptedData = fileBuffer.slice(12); // Remaining bytes = Encrypted Data
+
+      // Generate the key using the password
+      const key = await generateKey(password);
+
+      // Decrypt the data
+      const decryptedData = await window.crypto.subtle.decrypt(
         { name: "AES-GCM", iv },
         key,
-        fileBuffer
+        encryptedData
       );
 
-      // Combine IV and encrypted data into a single file
-      const encryptedBlob = new Blob([iv, new Uint8Array(encryptedData)], {
-        type: "application/octet-stream",
-      });
+      // Convert decrypted data into a Blob
+      const decryptedBlob = new Blob([decryptedData], { type: "application/octet-stream" });
+      const decryptedUrl = URL.createObjectURL(decryptedBlob);
 
-      const encryptedUrl = URL.createObjectURL(encryptedBlob);
-      setEncryptedFile(encryptedUrl);
+      setDecryptedFile(decryptedUrl);
     } catch (err) {
-      setError("Encryption failed. Please try again.");
+      setError("Decryption failed. Incorrect password or corrupted file.");
     }
   };
 
   return (
     <div className="flex flex-col items-center bg-gray-100 min-h-screen py-10">
-      <div className="bg-blue-600 text-white w-full text-center py-6 text-3xl font-bold">
-        Encrypt & Download File
+      <div className="bg-green-600 text-white w-full text-center py-6 text-3xl font-bold">
+        Decrypt & Download File
       </div>
 
       <div className="bg-white shadow-lg rounded-lg p-6 mt-6 w-full max-w-2xl">
         <div
-          className="border-2 border-dashed border-gray-300 p-10 text-center cursor-pointer hover:border-blue-600 transition"
+          className="border-2 border-dashed border-gray-300 p-10 text-center cursor-pointer hover:border-green-600 transition"
           onClick={() => fileInputRef.current.click()}
         >
-          <FaCloudUploadAlt className="text-gray-400 text-5xl mx-auto" />
-          <p className="text-gray-500 mt-2">Click to select a file</p>
+          <FaLockOpen className="text-gray-400 text-5xl mx-auto" />
+          <p className="text-gray-500 mt-2">Click to select an encrypted file</p>
         </div>
 
         <input
           type="file"
           ref={fileInputRef}
           className="hidden"
-          onChange={(e) => encryptFile(e.target.files[0])}
+          onChange={(e) => decryptFile(e.target.files[0])}
         />
 
         <input
@@ -98,13 +102,13 @@ const SendFile = () => {
         />
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
-        {encryptedFile && (
+        {decryptedFile && (
           <a
-            href={encryptedFile}
-            download={`${file?.name}.enc`}
-            className="block mt-4 text-blue-600 font-medium"
+            href={decryptedFile}
+            download={file?.name.replace(".enc", "")}
+            className="block mt-4 text-green-600 font-medium"
           >
-            Download Encrypted File
+            Download Decrypted File
           </a>
         )}
       </div>
@@ -112,7 +116,26 @@ const SendFile = () => {
   );
 };
 
-export default SendFile;
+export default FileDecryption;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

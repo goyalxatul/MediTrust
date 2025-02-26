@@ -4,9 +4,10 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import HomePage from "./Components/HomePage";
 import Navbar from "./Components/Navbar";
 import SendFilePage from "./Components/SendFilePage";
-import FileDownload from "./Components/FileDownload"; // Import File Download Page
 import Footer from "./Components/Footer"; // Import Footer Component
 import SignOutPage from "./Components/SignOutPage";
+import FileDecryptor from "./Components/FileDecrypter";
+import AboutPage from "./Components/AboutUs";
 
 const App = () => {
   return (
@@ -19,11 +20,14 @@ const App = () => {
         </SignedOut>
         <SignedIn>
           <Navbar />
-          <Routes>
+      
+         <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/sendfiles" element={<SendFilePage />} />
-            <Route path="/download" element={<FileDownload />} /> {/* New Route for File Download */}
+            <Route path="/download" element={<FileDecryptor/>} /> {/* New Route for File Download */}
+            <Route path ="/about" element={<AboutPage />} />
           </Routes>
+          
           <Footer /> {/* Add Footer Here */}
         </SignedIn>
       </div>

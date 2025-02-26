@@ -1,28 +1,29 @@
-import { FaSignOutAlt } from "react-icons/fa";
 import { SignedOut, SignInButton } from "@clerk/clerk-react";
+import EncryptData from "./EncryptData"; // Importing EncryptData button
 
-const Signout = () => {
+const GetStarted = () => {
   return (
-    <div 
-      className="flex justify-start items-center h-screen w-full bg-cover bg-center px-16"
-      style={{ backgroundImage: "url('/e.avif')" }}
-    >
-      
-      <div className="bg-white-100 shadow-xl rounded-2xl p-8 text-left text-gray-600 max-w-md w-full">
-        <FaSignOutAlt className="text-6xl text-blue-400" />
-        <h2 className="text-3xl font-semibold mt-4">Welcome to Cryptify</h2>
-        <p className="text-gray-600">Dive into the World of Safe Share.</p>
-        <SignedOut>
-          <div className="p-6 rounded-lg mt-4">
-            <SignInButton className="w-full py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition">
-              Login / Sign Up  
-            </SignInButton>
+    <div className="flex flex-col justify-center items-center min-h-screen bg-black text-white text-center px-6">
+      {/* Welcome Message */}
+      <h1 className="text-4xl font-bold mb-4">Welcome to <span className="text-blue-500">MediTrust</span></h1>
+      <p className="text-gray-400 text-lg mb-8">Upload. Encrypt. Share Securely.</p>
+
+      {/* Sign-In & Encrypt Button */}
+      <SignedOut>
+        <SignInButton>
+          <div>
+            <EncryptData /> {/* Styled button for secure action */}
           </div>
-        </SignedOut>
-      </div>
+        </SignInButton>
+      </SignedOut>
     </div>
   );
 };
 
-export default Signout;
+export default GetStarted;
+
+
+
+
+
 

@@ -1,64 +1,79 @@
-import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import Navbar from "./Navbar";
+import { motion } from "framer-motion";
+import { BouncyCardsFeatures } from "./BouncyCardsFeatures";
+import EncryptShareSection from "./EncryptShareSection";
+import Marquee from "./Marquee";
+import AnimatedTerminal from "./AnimatedTerminal";
+import AboutPage from "./AboutUs";
 
-export default function HomePage() {
-  const navigate = useNavigate(); // Hook for navigation
 
+const HomePage = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <SignedIn>
-        <div className="container text-center mt-10 px-4">
-          <h1 className="text-4xl font-bold">
-            The Only Tool You Need To <br /> Send Your Files Securely
-          </h1>
-          <p className="text-lg text-gray-700 mt-4">
-            Send your files and photos{" "}
-            <span className="font-semibold text-blue-600">SECURELY</span> with EncryptShare 
-            <br />
-            <span className="font-semibold text-blue-600">ANYTIME</span> and{" "}
-            <span className="font-semibold text-blue-600">ANYWHERE</span> in the world.
-          </p>
+    <div className="bg-black text-white font-sans">
+      {/* Navbar */}
+      {/* Hero Section */}
+      <section className="relative flex flex-col items-center justify-center text-center py-20 bg-black overflow-hidden">
+      {/* Animated Title */}
+      <motion.h2
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+        className="text-6xl font-extrabold text-white leading-tight"
+      >
+        <span className="bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text drop-shadow-lg">
+        Privacy First,
+        </span>
+        <br />
+        <motion.span
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5, duration: 1 }}
+          className="text-white"
+        >
+           Security Always
+        </motion.span>
+      </motion.h2>
 
-          {/* Button Navigates to /sendfiles */}
-          <button
-            onClick={() => navigate("/sendfiles")}
-            className="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition"
-          >
-            Go To The App
-          </button>
+      {/* Animated Subtitle */}
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 1 }}
+        className="mt-4 text-lg text-gray-400 max-w-2xl"
+      >
+        Connect to MediTrust and experience seamless, encrypted, and hassle-free access to your medical records—anytime, anywhere. <br />
 
-          {/* Feature Boxes */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-12">
-            <div className="text-center">
-              <img src="/a.png" alt="Security" className="mx-auto w-12 h-12"/>
-              <h3 className="text-xl font-semibold mt-2">High Security</h3>
-              <p className="text-gray-600">Your files are encrypted end-to-end for maximum security.</p>
-            </div>
-            <div className="text-center">
-              <img src="/b.png" alt="Speed" className="mx-auto w-12 h-12"/>
-              <h3 className="text-xl font-semibold mt-2">Speed Transfer</h3>
-              <p className="text-gray-600">Share files instantly with optimized transfer speeds.</p>
-            </div>
-            <div className="text-center">
-              <img src="/c.png" alt="Share" className="mx-auto w-12 h-12"/>
-              <h3 className="text-xl font-semibold mt-2">Easy Share</h3>
-              <p className="text-gray-600">Simple and intuitive interface for hassle-free file sharing.</p>
-            </div>
-          </div>
-        </div>
-      </SignedIn>
+      </motion.p>
 
-      <SignedOut>
-        <div className="flex flex-col items-center justify-center h-screen">
-          <h1 className="text-2xl font-bold">Please Sign In</h1>
-          <SignInButton redirectUrl="/">
-            <button className="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 transition">
-              Let's Go
-            </button>
-          </SignInButton>
-        </div>
-      </SignedOut>
+      {/* Animated Buttons */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.2, duration: 1 }}
+        className="mt-6 flex space-x-4"
+      >
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="px-6 py-3 text-lg font-semibold bg-white text-black rounded-full shadow-md hover:bg-gray-200 transition"  onClick={() => window.location.href = '/about'}
+        >
+          Know About Us
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="px-6 py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full shadow-lg hover:opacity-90 transition" onClick={() => window.location.href = '/sendfiles'}
+        >
+          Lets Start
+        </motion.button>
+      </motion.div>
+    </section>
+    <BouncyCardsFeatures />
+    <EncryptShareSection/>
+    <Marquee/>
     </div>
   );
-}
+};
 
+export default HomePage;

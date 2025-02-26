@@ -1,75 +1,54 @@
-require("dotenv").config();
-const express = require("express");
-const multer = require("multer");
-const AWS = require("aws-sdk");
-const { Sequelize, DataTypes } = require("sequelize");
-const CryptoJS = require("crypto-js");
-const fs = require("fs");
-const path = require("path");
+
+import express from "express";
+import multer from "multer";
+import fs from "fs";
+import crypto from "crypto";
+import cors from "cors";
 
 const app = express();
-const PORT = process.env.PORT || 5001;
+const upload = multer({ dest: "uploads/" });
+const PORT = 5000;
 
-app.use(express.json());
+// Enable CORS for frontend
+app.use(cors());
 
-// Set up Sequelize
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
-  host: process.env.DB_HOST,
-  dialect: "mysql",
+// Generate Encryption Key
+app.get("/generate-key", (req, res) => {
+  const key = crypto.randomBytes(32).toString("hex");
+  res.json({ key });
 });
 
-const FileUpload = sequelize.define("FileUpload", {
-  id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  fileName: { type: DataTypes.STRING, allowNull: false },
-  fileType: { type: DataTypes.STRING, allowNull: false },
-  s3Url: { type: DataTypes.STRING, allowNull: false },
+// Encrypt File
+app.post("/encrypt", upload.single("file"), (req, res) => {
+  const { path, originalname } = req.file;
+  const encryptionKey = req.body.key;
+  const iv = crypto.randomBytes(16);
+  const key = Buffer.from(encryptionKey, "hex");
+
+  const cipher = crypto.createCipheriv("aes-256-gcm", key, iv);
+  const input = fs.createReadStream(path);
+  const output = fs.createWriteStream(`uploads/${originalname}.enc`);
+
+  output.write(iv);
+  input.pipe(cipher).pipe(output);
+
+  output.on("finish", () => {
+    res.json({ message: "File encrypted successfully!", file: `${originalname}.enc` });
+  });
 });
 
-sequelize.sync();
+// Decrypt File
+app.get("/decrypt", (req, res) => {
+  const { key } = req.query;
+  const encryptedFile = "uploads/encrypted_file.enc";
+  const iv = fs.readFileSync(encryptedFile).slice(0, 16);
+  const encryptedData = fs.readFileSync(encryptedFile).slice(16);
 
-// AWS S3 Configuration
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,
-});
+  const decipher = crypto.createDecipheriv("aes-256-gcm", Buffer.from(key, "hex"), iv);
+  const decrypted = Buffer.concat([decipher.update(encryptedData), decipher.final()]);
 
-// Multer storage
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
-
-app.post("/api/upload", upload.single("file"), async (req, res) => {
-  if (!req.file) return res.status(400).json({ message: "No file uploaded." });
-
-  const { password } = req.body;
-  if (!password) return res.status(400).json({ message: "Password is required." });
-
-  // Encrypt file
-  const fileBuffer = req.file.buffer;
-  const wordArray = CryptoJS.lib.WordArray.create(new Uint8Array(fileBuffer));
-  const encrypted = CryptoJS.AES.encrypt(wordArray, password).toString();
-
-  const s3Params = {
-    Bucket: process.env.S3_BUCKET_NAME,
-    Key: `${Date.now()}_${req.file.originalname}.enc`,
-    Body: encrypted,
-    ContentType: "text/plain",
-  };
-
-  try {
-    const s3Upload = await s3.upload(s3Params).promise();
-    const newFile = await FileUpload.create({
-      fileName: req.file.originalname,
-      fileType: req.file.mimetype,
-      s3Url: s3Upload.Location,
-    });
-
-    res.status(200).json({ message: "File uploaded successfully", file: newFile });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "S3 upload failed", error: err.message });
-  }
+  res.setHeader("Content-Disposition", "attachment; filename=decrypted_file");
+  res.send(decrypted);
 });
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
