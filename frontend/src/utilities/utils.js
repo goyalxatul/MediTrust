@@ -9,6 +9,8 @@ const NUM_POINTS = 2500;
  * --- Credit ---
  * https://stackoverflow.com/questions/16360533/calculate-color-hex-having-2-colors-and-percent-position
  */
+
+
 const getGradientStop = (ratio) => {
     // For outer ring numbers potentially past max radius,
     // just clamp to 0
