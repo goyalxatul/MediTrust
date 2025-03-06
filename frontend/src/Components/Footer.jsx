@@ -9,7 +9,7 @@ const Footer = () => {
           <div>
             <h2 className="text-white text-2xl font-bold">MediTrust</h2>
             <p className="mt-2 text-sm">
-              Pulvinar eget ut adipiscing magna acconan etolard dole.
+            MediTrust is a secure and innovative encryption & sharing platform designed to streamline medical data management, ensuring privacy, accessibility, and trust between patients, healthcare providers, and institutions. It focuses on encrypted file storage, seamless data sharing, and AI-powered insights to enhance medical decision-making.
             </p>
           </div>
 

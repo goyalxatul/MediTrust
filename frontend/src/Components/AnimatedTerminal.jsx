@@ -11,7 +11,7 @@ const options = [
 
 export default function TerminalUI() {
   const [active, setActive] = useState(options[2])
-
+  
   return (
     <div className="flex flex-col md:flex-row h-screen items-center justify-center bg-[#1B1E2B] p-4">
       {/* Terminal Window */}

@@ -5,12 +5,10 @@ const AboutPage = () => {
   const services = [
     { title: "End-to-End Encryption", desc: "Your data is protected with top-tier encryption standards." },
     { title: "Secure Cloud Storage", desc: "Multi-layer protection ensures your files remain safe." },
-    { title: "Two-Factor Authentication", desc: "Enhanced security with multi-step login verification." },
-    { title: "AI-Powered Threat Detection", desc: "Real-time analysis to detect and prevent cyber threats." },
     { title: "Blockchain Security", desc: "Tamper-proof data verification with blockchain technology." },
-    { title: "Zero-Trust Architecture", desc: "Ensuring only verified access to sensitive information." },
+    { title: "Substitution-Permutation Network (SPN) architecture", desc: "Ensuring only verified access to sensitive information." },
     { title: "Privacy-Focused Solutions", desc: "Your data remains private—no third-party access." },
-    { title: "24/7 Monitoring", desc: "Real-time alerts and system protection around the clock." },
+   
   ];
 
   return (

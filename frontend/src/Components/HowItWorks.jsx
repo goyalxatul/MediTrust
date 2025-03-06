@@ -18,6 +18,7 @@ const HowItWorks = () => {
       description: "Receive AI-powered medical guidance.",
     },
   ];
+  
 
   return (
     <div className="bg-gray-900 text-white py-12 text-center">
