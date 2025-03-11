@@ -63,7 +63,7 @@ const HomePage = () => {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="px-6 py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full shadow-lg hover:opacity-90 transition" onClick={() => window.location.href = '/sendfiles'}
+          className="px-6 py-3 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full shadow-lg hover:opacity-90 transition" onClick={() => window.location.href = '/start'}
         >
           Lets Start
         </motion.button>

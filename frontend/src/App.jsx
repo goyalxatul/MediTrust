@@ -8,6 +8,7 @@ import Footer from "./Components/Footer"; // Import Footer Component
 import SignOutPage from "./Components/SignOutPage";
 import FileDecryptor from "./Components/FileDecrypter";
 import AboutPage from "./Components/AboutUs";
+import StartJourney from "./Components/StartJourney";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
       
          <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/start" element={<StartJourney/>} />
             <Route path="/sendfiles" element={<SendFilePage />} />
             <Route path="/download" element={<FileDecryptor/>} /> {/* New Route for File Download */}
             <Route path ="/about" element={<AboutPage />} />

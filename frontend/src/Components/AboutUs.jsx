@@ -8,7 +8,6 @@ const AboutPage = () => {
     { title: "Blockchain Security", desc: "Tamper-proof data verification with blockchain technology." },
     { title: "Substitution-Permutation Network (SPN) architecture", desc: "Ensuring only verified access to sensitive information." },
     { title: "Privacy-Focused Solutions", desc: "Your data remains private—no third-party access." },
-   
   ];
 
   return (

@@ -12,7 +12,6 @@ const Footer = () => {
             MediTrust is a secure and innovative encryption & sharing platform designed to streamline medical data management, ensuring privacy, accessibility, and trust between patients, healthcare providers, and institutions. It focuses on encrypted file storage, seamless data sharing, and AI-powered insights to enhance medical decision-making.
             </p>
           </div>
-
           {/* Middle Section - Links */}
           <div className="flex flex-col space-y-2">
             <h3 className="text-white font-semibold">Home</h3>
@@ -59,3 +58,4 @@ const Footer = () => {
 };
 
 export default Footer;
+ 
