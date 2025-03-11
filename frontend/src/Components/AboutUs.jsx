@@ -30,12 +30,12 @@ const AboutPage = () => {
         className="bg-gray-800 p-6 md:p-8 rounded-lg max-w-2xl text-center"
       >
         <p className="text-gray-300 mb-4">
-          MediTrust is built to provide **military-grade encryption** and **cutting-edge security** solutions for 
+          MediTrust is built to provide military-grade encryption and cutting-edge security solutions for 
           protecting your sensitive data. With real-time threat detection and zero-trust security, 
-          we ensure **complete confidentiality and privacy** for individuals and businesses alike.
+          we ensure complete confidentiality and privacy for individuals and businesses alike.
         </p>
         <p className="text-gray-300">
-          From **secure cloud storage** to **AI-driven threat detection**, MediTrust is your **ultimate security shield** 
+          From secure cloud storage to AI-driven threat detection, MediTrust is your ultimate security shield
           against cyber threats.
         </p>
       </motion.div>
