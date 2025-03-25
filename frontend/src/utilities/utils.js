@@ -5,10 +5,6 @@ const LEFT_COLOR = "6366f1";
 const RIGHT_COLOR = "8b5cf6";
 const NUM_POINTS = 2500;
 
-/**
- * --- Credit ---
- * https://stackoverflow.com/questions/16360533/calculate-color-hex-having-2-colors-and-percent-position
- */
 
 
 const getGradientStop = (ratio) => {

@@ -3,12 +3,11 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 
 const SendFile = () => {
   const [file, setFile] = useState(null);
-  const [encryptedFile, setEncryptedFile] = useState(null);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [uploadStatus, setUploadStatus] = useState("");
   const fileInputRef = useRef(null);
 
-  // Generate a cryptographic key from the password
   const generateKey = async (password) => {
     const encoder = new TextEncoder();
     const keyMaterial = await window.crypto.subtle.importKey(
@@ -33,7 +32,6 @@ const SendFile = () => {
     );
   };
 
-  // Encrypt file
   const encryptFile = async (selectedFile) => {
     if (!selectedFile) return;
     if (!password) {
@@ -46,7 +44,7 @@ const SendFile = () => {
 
     const fileBuffer = await selectedFile.arrayBuffer();
     const key = await generateKey(password);
-    const iv = window.crypto.getRandomValues(new Uint8Array(12)); // 12-byte IV
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
 
     try {
       const encryptedData = await window.crypto.subtle.encrypt(
@@ -55,31 +53,51 @@ const SendFile = () => {
         fileBuffer
       );
 
-      // Combine IV and encrypted data into a single file
       const encryptedBlob = new Blob([iv, new Uint8Array(encryptedData)], {
         type: "application/octet-stream",
       });
 
-      const encryptedUrl = URL.createObjectURL(encryptedBlob);
-      setEncryptedFile(encryptedUrl);
+      // Send the encrypted file to the backend
+      uploadToBackend(encryptedBlob, selectedFile.name);
     } catch (err) {
       setError("Encryption failed. Please try again.");
     }
   };
 
+  const uploadToBackend = async (blob, fileName) => {
+    const formData = new FormData();
+    formData.append("file", blob, `${fileName}.enc`);
+
+    try {
+      const response = await fetch("http://localhost:5001/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setUploadStatus(`File uploaded successfully: ${result.url}`);
+      } else {
+        setUploadStatus(`Upload failed: ${result.error}`);
+      }
+    } catch (error) {
+      setUploadStatus("Error uploading file. Please try again.");
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center bg-gray-100 min-h-screen py-10">
-      <div className="bg-blue-600 text-white w-full text-center py-6 text-3xl font-bold">
-        Encrypt & Download File
+    <div className="flex flex-col items-center bg-black text-white min-h-screen py-10">
+      <div className="bg-gray-900 text-white w-full text-center py-6 text-3xl font-bold shadow-lg">
+        Encrypt & Upload File
       </div>
 
-      <div className="bg-white shadow-lg rounded-lg p-6 mt-6 w-full max-w-2xl">
+      <div className="bg-gray-800 shadow-lg rounded-lg p-6 mt-6 w-full max-w-2xl">
         <div
-          className="border-2 border-dashed border-gray-300 p-10 text-center cursor-pointer hover:border-blue-600 transition"
+          className="border-2 border-dashed border-gray-500 p-10 text-center cursor-pointer hover:border-white transition"
           onClick={() => fileInputRef.current.click()}
         >
           <FaCloudUploadAlt className="text-gray-400 text-5xl mx-auto" />
-          <p className="text-gray-500 mt-2">Click to select a file</p>
+          <p className="text-gray-300 mt-2">Click to select a file</p>
         </div>
 
         <input
@@ -94,41 +112,15 @@ const SendFile = () => {
           placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 mt-4"
+          className="w-full bg-gray-700 text-white border rounded-lg px-3 py-2 mt-4 focus:outline-none focus:ring-2 focus:ring-white"
         />
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
-        {encryptedFile && (
-          <a
-            href={encryptedFile}
-            download={`${file?.name}.enc`}
-            className="block mt-4 text-blue-600 font-medium"
-          >
-            Download Encrypted File
-          </a>
-        )}
+        {uploadStatus && <p className="text-green-400 text-sm mt-2">{uploadStatus}</p>}
       </div>
     </div>
   );
 };
 
 export default SendFile;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

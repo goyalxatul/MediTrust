@@ -8,7 +8,6 @@ const FileDecryption = () => {
   const [error, setError] = useState("");
   const fileInputRef = useRef(null);
 
-  // Generate cryptographic key
   const generateKey = async (password) => {
     const encoder = new TextEncoder();
     const keyMaterial = await window.crypto.subtle.importKey(
@@ -33,7 +32,6 @@ const FileDecryption = () => {
     );
   };
 
-  // Decrypt the file
   const decryptFile = async (selectedFile) => {
     if (!selectedFile) return;
     if (!password) {
@@ -44,46 +42,61 @@ const FileDecryption = () => {
     setFile(selectedFile);
     setError("");
 
-    const fileBuffer = await selectedFile.arrayBuffer();
-
     try {
-      // Extract IV (first 12 bytes) and encrypted content
-      const iv = new Uint8Array(fileBuffer.slice(0, 12)); // First 12 bytes = IV
-      const encryptedData = fileBuffer.slice(12); // Remaining bytes = Encrypted Data
+      const fileBuffer = await selectedFile.arrayBuffer();
 
-      // Generate the key using the password
+      if (fileBuffer.byteLength < 12) {
+        throw new Error("Invalid encrypted file. The file is too small.");
+      }
+
+      const iv = new Uint8Array(fileBuffer.slice(0, 12));
+      const encryptedData = fileBuffer.slice(12);
+
+      if (iv.length !== 12) {
+        throw new Error("Invalid IV length. Expected 12 bytes.");
+      }
+
       const key = await generateKey(password);
 
-      // Decrypt the data
       const decryptedData = await window.crypto.subtle.decrypt(
         { name: "AES-GCM", iv },
         key,
         encryptedData
       );
 
-      // Convert decrypted data into a Blob
-      const decryptedBlob = new Blob([decryptedData], { type: "application/octet-stream" });
+      const decryptedBlob = new Blob([decryptedData], {
+        type: "application/octet-stream",
+      });
+
+      const cleanFileName = selectedFile.name
+        .replace(/\(\d+\)\.enc$/, "")
+        .replace(/\.enc$/, "")
+        .trim();
+
       const decryptedUrl = URL.createObjectURL(decryptedBlob);
 
-      setDecryptedFile(decryptedUrl);
+      setDecryptedFile({ url: decryptedUrl, name: cleanFileName });
     } catch (err) {
-      setError("Decryption failed. Incorrect password or corrupted file.");
+      console.error("Decryption error:", err);
+      setError(
+        "Decryption failed. Incorrect password, corrupted file, or mismatched encryption method."
+      );
     }
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 min-h-screen py-10">
-      <div className="bg-green-600 text-white w-full text-center py-6 text-3xl font-bold">
+    <div className="flex flex-col items-center bg-black text-white min-h-screen py-10">
+      <div className="bg-gray-900 text-white w-full text-center py-6 text-3xl font-bold">
         Decrypt & Download File
       </div>
 
-      <div className="bg-white shadow-lg rounded-lg p-6 mt-6 w-full max-w-2xl">
+      <div className="bg-gray-800 shadow-lg rounded-lg p-6 mt-6 w-full max-w-2xl">
         <div
-          className="border-2 border-dashed border-gray-300 p-10 text-center cursor-pointer hover:border-green-600 transition"
+          className="border-2 border-dashed border-gray-600 p-10 text-center cursor-pointer hover:border-white transition"
           onClick={() => fileInputRef.current.click()}
         >
           <FaLockOpen className="text-gray-400 text-5xl mx-auto" />
-          <p className="text-gray-500 mt-2">Click to select an encrypted file</p>
+          <p className="text-gray-300 mt-2">Click to select an encrypted file</p>
         </div>
 
         <input
@@ -98,15 +111,15 @@ const FileDecryption = () => {
           placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 mt-4"
+          className="w-full border border-gray-600 bg-gray-900 text-white rounded-lg px-3 py-2 mt-4"
         />
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
         {decryptedFile && (
           <a
-            href={decryptedFile}
-            download={file?.name.replace(".enc", "")}
-            className="block mt-4 text-green-600 font-medium"
+            href={decryptedFile.url}
+            download={decryptedFile.name}
+            className="block mt-4 text-green-400 font-medium hover:text-green-300"
           >
             Download Decrypted File
           </a>
@@ -117,9 +130,6 @@ const FileDecryption = () => {
 };
 
 export default FileDecryption;
-
-
-
 
 
 
