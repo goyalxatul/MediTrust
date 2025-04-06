@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
+import ExtractFileData from "./ExtractFileData"; // Import ExtractFileData
 import { FaCloudUploadAlt } from "react-icons/fa";
 
 const SendFile = () => {
@@ -6,7 +7,7 @@ const SendFile = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
-  const fileInputRef = useRef(null);
+  const [metadata, setMetadata] = useState(null); // Store extracted metadata
 
   const generateKey = async (password) => {
     const encoder = new TextEncoder();
@@ -32,17 +33,15 @@ const SendFile = () => {
     );
   };
 
-  const encryptFile = async (selectedFile) => {
-    if (!selectedFile) return;
+  const encryptFile = async () => {
+    if (!file) return;
     if (!password) {
       setError("Please enter a password before encrypting the file.");
       return;
     }
 
-    setFile(selectedFile);
     setError("");
-
-    const fileBuffer = await selectedFile.arrayBuffer();
+    const fileBuffer = await file.arrayBuffer();
     const key = await generateKey(password);
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
 
@@ -57,8 +56,8 @@ const SendFile = () => {
         type: "application/octet-stream",
       });
 
-      // Send the encrypted file to the backend
-      uploadToBackend(encryptedBlob, selectedFile.name);
+      // Upload the encrypted file
+      uploadToBackend(encryptedBlob, file.name);
     } catch (err) {
       setError("Encryption failed. Please try again.");
     }
@@ -85,42 +84,47 @@ const SendFile = () => {
     }
   };
 
+  // ✅ Callback to handle metadata extraction
+  const handleMetadataExtracted = (selectedFile, extractedMetadata) => {
+    setFile(selectedFile); // Set the selected file
+    setMetadata(extractedMetadata); // Store metadata
+  };
+
   return (
     <div className="flex flex-col items-center bg-black text-white min-h-screen py-10">
       <div className="bg-gray-900 text-white w-full text-center py-6 text-3xl font-bold shadow-lg">
         Encrypt & Upload File
       </div>
 
-      <div className="bg-gray-800 shadow-lg rounded-lg p-6 mt-6 w-full max-w-2xl">
-        <div
-          className="border-2 border-dashed border-gray-500 p-10 text-center cursor-pointer hover:border-white transition"
-          onClick={() => fileInputRef.current.click()}
-        >
-          <FaCloudUploadAlt className="text-gray-400 text-5xl mx-auto" />
-          <p className="text-gray-300 mt-2">Click to select a file</p>
+      {/* Extract File Data Component */}
+      <ExtractFileData onMetadataExtracted={handleMetadataExtracted} />
+
+      {metadata && (
+        <div className="mt-4">
+          <h3 className="text-lg font-bold">Extracted Metadata:</h3>
+          <pre className="text-gray-300">{JSON.stringify(metadata, null, 2)}</pre>
         </div>
+      )}
 
-        <input
-          type="file"
-          ref={fileInputRef}
-          className="hidden"
-          onChange={(e) => encryptFile(e.target.files[0])}
-        />
-
-        <input
+<input
           type="password"
           placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full bg-gray-700 text-white border rounded-lg px-3 py-2 mt-4 focus:outline-none focus:ring-2 focus:ring-white"
         />
-        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      <button
+        onClick={encryptFile}
+        className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+        disabled={!file || !metadata}
+      >
+        Encrypt & Upload
+      </button>
 
-        {uploadStatus && <p className="text-green-400 text-sm mt-2">{uploadStatus}</p>}
-      </div>
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      {uploadStatus && <p className="text-green-400 text-sm mt-2">{uploadStatus}</p>}
     </div>
   );
 };
 
 export default SendFile;
-
