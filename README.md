@@ -6,10 +6,10 @@ A full-stack solution to **encrypt, upload, and download files securely** using 
 
 ## 📸 Preview
 
-> 🖼️ Replace these URLs with real screenshots from your app  
+> 🖼️ 
 | Upload Interface | Drag & Drop | Progress & Download |
 |------------------|-------------|----------------------|
-| ![Upload UI](./images/image.png) | ![Drag Drop](https://via.placeholder.com/400x200?text=Drag+%26+Drop+Upload) | ![Progress](https://via.placeholder.com/400x200?text=Upload+Progress+%2B+Download) |
+| ![Upload UI](./images/image.png) | ![Drag Drop](./images/image2.png) | ![Progress](./images/image3.png) |
 
 ---
 
