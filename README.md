@@ -1,26 +1,40 @@
-# Encrypt & Upload File Securely
+# 📦 Encrypt & Upload File Securely
 
-## Overview
-This project provides a React-based file encryption and upload system. It allows users to:
+A full-stack solution to **encrypt, upload, and download files securely** using **AES encryption**, **Amazon S3**, and **RDS (MySQL/PostgreSQL)**. Built with **React**, **Node.js**, and **AWS**.
 
-- Encrypt files using AES encryption.
-- Upload encrypted files to AWS S3.
-- Store file metadata in an RDS database.
-- Download and decrypt files.
-- Drag and drop files for upload.
+---
 
-## Features
-- **File Encryption**: Uses CryptoJS to encrypt files with a user-provided password.
-- **Drag & Drop Upload**: Allows users to drag and drop files for easy selection.
-- **Progress Bar**: Displays upload progress in real-time.
-- **Secure Storage**: Uploads files to Amazon S3 and saves metadata in an RDS database.
-- **Download Encrypted Files**: Provides an option to download the encrypted file.
+## 📸 Preview
 
-## Tech Stack
-- **Frontend**: React, Tailwind CSS, CryptoJS, Axios
-- **Backend**: Node.js, Express, Multer, AWS SDK, MySQL (RDS)
-- **Storage**: Amazon S3
-- **Database**: Amazon RDS (MySQL/PostgreSQL)
+> 🖼️ Replace these URLs with real screenshots from your app  
+| Upload Interface | Drag & Drop | Progress & Download |
+|------------------|-------------|----------------------|
+| ![Upload UI](https://via.placeholder.com/400x200?text=Upload+File+UI) | ![Drag Drop](https://via.placeholder.com/400x200?text=Drag+%26+Drop+Upload) | ![Progress](https://via.placeholder.com/400x200?text=Upload+Progress+%2B+Download) |
+
+---
+
+## 🚀 Features
+
+- 🔐 **AES Encryption** using CryptoJS (password protected)
+- 📂 **Drag & Drop Upload**
+- 📶 **Real-Time Upload Progress Bar**
+- ☁️ **Amazon S3 Storage**
+- 🧾 **Metadata storage in RDS (MySQL/PostgreSQL)**
+- 📥 **Secure File Download & Decryption**
+
+---
+
+## 🧰 Tech Stack
+
+| Frontend         | Backend            | Cloud Storage | Database                    |
+|------------------|--------------------|---------------|-----------------------------|
+| React            | Node.js + Express  | Amazon S3     | Amazon RDS (MySQL/PostgreSQL) |
+| Tailwind CSS     | Multer + AWS SDK   |               |                             |
+| CryptoJS + Axios |                    |               |                             |
+
+---
+
+## 📦 Project Structure
 
 ## Installation & Setup
 ### Prerequisites
@@ -74,18 +88,6 @@ This project provides a React-based file encryption and upload system. It allows
 4. Click **Upload to S3** to encrypt and upload.
 5. Download the encrypted file if needed.
 
-## API Endpoints
-### Upload File
-```
-POST /api/upload
-```
-- Uploads an encrypted file to S3 and stores metadata in RDS.
-
-### Download File
-```
-GET /api/download/:filename
-```
-- Retrieves the encrypted file from S3.
 
 ## License
 This project is licensed under the MIT License.
