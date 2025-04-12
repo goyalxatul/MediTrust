@@ -86,11 +86,11 @@ const FileDecryption = () => {
 
   return (
     <div className="flex flex-col items-center bg-black text-white min-h-screen py-10">
-      <div className="bg-gray-900 text-white w-full text-center py-6 text-3xl font-bold">
+      <div className="bg-black text-white w-full text-center py-6 text-3xl font-bold">
         Decrypt & Download File
       </div>
 
-      <div className="bg-gray-800 shadow-lg rounded-lg p-6 mt-6 w-full max-w-2xl">
+      <div className="bg-black shadow-lg rounded-lg p-6 mt-6 w-full max-w-2xl">
         <div
           className="border-2 border-dashed border-gray-600 p-10 text-center cursor-pointer hover:border-white transition"
           onClick={() => fileInputRef.current.click()}
@@ -111,7 +111,7 @@ const FileDecryption = () => {
           placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border border-gray-600 bg-gray-900 text-white rounded-lg px-3 py-2 mt-4"
+          className="w-full border border-gray-600 bg-black text-white rounded-lg px-3 py-2 mt-4"
         />
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 

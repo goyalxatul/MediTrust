@@ -8,6 +8,7 @@ const SendFile = () => {
   const [error, setError] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
   const [metadata, setMetadata] = useState(null); // Store extracted metadata
+  const [loading, setLoading] = useState(false); // Loading state
 
   const generateKey = async (password) => {
     const encoder = new TextEncoder();
@@ -41,6 +42,8 @@ const SendFile = () => {
     }
 
     setError("");
+    setLoading(true); // Start loading
+
     const fileBuffer = await file.arrayBuffer();
     const key = await generateKey(password);
     const iv = window.crypto.getRandomValues(new Uint8Array(12));
@@ -60,6 +63,7 @@ const SendFile = () => {
       uploadToBackend(encryptedBlob, file.name);
     } catch (err) {
       setError("Encryption failed. Please try again.");
+      setLoading(false); // Stop loading
     }
   };
 
@@ -82,9 +86,9 @@ const SendFile = () => {
     } catch (error) {
       setUploadStatus("Error uploading file. Please try again.");
     }
+    setLoading(false); // Stop loading after upload
   };
 
-  // ✅ Callback to handle metadata extraction
   const handleMetadataExtracted = (selectedFile, extractedMetadata) => {
     setFile(selectedFile); // Set the selected file
     setMetadata(extractedMetadata); // Store metadata
@@ -92,7 +96,7 @@ const SendFile = () => {
 
   return (
     <div className="flex flex-col items-center bg-black text-white min-h-screen py-10">
-      <div className="bg-gray-900 text-white w-full text-center py-6 text-3xl font-bold shadow-lg">
+      <div className="bg-black text-white w-full text-center py-6 text-3xl font-semibold shadow-lg rounded-lg mb-6">
         Encrypt & Upload File
       </div>
 
@@ -100,29 +104,32 @@ const SendFile = () => {
       <ExtractFileData onMetadataExtracted={handleMetadataExtracted} />
 
       {metadata && (
-        <div className="mt-4">
-          <h3 className="text-lg font-bold">Extracted Metadata:</h3>
-          <pre className="text-gray-300">{JSON.stringify(metadata, null, 2)}</pre>
+        <div className="mt-4 w-full max-w-xl bg-black p-4 rounded-lg shadow-md border border-white">
+          <h3 className="text-lg font-semibold mb-2">Extracted Metadata:</h3>
+          <pre className="text-white">{JSON.stringify(metadata, null, 2)}</pre>
         </div>
       )}
 
-<input
+      <div className="w-full max-w-xl bg-black p-4 rounded-lg mt-6">
+        <input
           type="password"
           placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full bg-gray-700 text-white border rounded-lg px-3 py-2 mt-4 focus:outline-none focus:ring-2 focus:ring-white"
+          className="w-full bg-black text-white border border-white rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
         />
+      </div>
+
       <button
         onClick={encryptFile}
-        className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-        disabled={!file || !metadata}
+        className="mt-6 bg-white text-black hover:bg-gray-300 px-6 py-3 rounded-lg text-xl focus:outline-none focus:ring-2 focus:ring-white"
+        disabled={!file || !metadata || loading}
       >
-        Encrypt & Upload
+        {loading ? "Encrypting..." : "Encrypt & Upload"}
       </button>
 
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-      {uploadStatus && <p className="text-green-400 text-sm mt-2">{uploadStatus}</p>}
+      {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+      {uploadStatus && <p className="text-green-400 text-sm mt-4">{uploadStatus}</p>}
     </div>
   );
 };

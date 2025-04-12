@@ -3,9 +3,12 @@ require("dotenv").config();
 const express = require("express");
 const multer = require("multer");
 const cors = require("cors");
+const db = require("./db"); 
+
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 const s3 = new S3Client({
   region: "us-east-2",
@@ -44,5 +47,23 @@ app.post("/upload", upload.single("file"), async (req, res) => {
     res.status(500).json({ error: "Error uploading file to S3", details: error.message });
   }
 });
+
+app.post("/save-metadata", (req, res) => {
+  const { Name, Age, Gender, Illness, DoctorName, Prescription } = req.body;
+
+  const sql = `
+    INSERT INTO metadata (name, age, gender, illness, doctor_name, prescription)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(sql, [Name, Age, Gender, Illness, DoctorName, Prescription], (err, result) => {
+    if (err) {
+      console.error("Error inserting metadata:", err);
+      return res.status(500).json({ error: "Failed to save metadata" });
+    }
+    res.status(200).json({ message: "Metadata saved successfully", id: result.insertId });
+  });
+});
+
 
 app.listen(5001, () => console.log("Server running on port 5001"));
