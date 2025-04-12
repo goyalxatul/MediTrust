@@ -9,7 +9,7 @@ A full-stack solution to **encrypt, upload, and download files securely** using 
 > 🖼️ Replace these URLs with real screenshots from your app  
 | Upload Interface | Drag & Drop | Progress & Download |
 |------------------|-------------|----------------------|
-| ![Upload UI](https://via.placeholder.com/400x200?text=Upload+File+UI) | ![Drag Drop](https://via.placeholder.com/400x200?text=Drag+%26+Drop+Upload) | ![Progress](https://via.placeholder.com/400x200?text=Upload+Progress+%2B+Download) |
+| ![Upload UI](C:\Users\goyal\OneDrive\Desktop\secureeshare\images\image.png) | ![Drag Drop](https://via.placeholder.com/400x200?text=Drag+%26+Drop+Upload) | ![Progress](https://via.placeholder.com/400x200?text=Upload+Progress+%2B+Download) |
 
 ---
 
