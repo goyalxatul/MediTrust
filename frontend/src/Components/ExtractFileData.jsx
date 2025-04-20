@@ -31,7 +31,7 @@ const ExtractFileData = ({ onMetadataExtracted }) => {
         setUploadStatus("Metadata extracted successfully.");
 
         // Send metadata to Node.js backend
-        await fetch("http://18.217.9.56:5001/save-metadata", {
+        await fetch("http://18.221.115.26:5001/save-metadata", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
