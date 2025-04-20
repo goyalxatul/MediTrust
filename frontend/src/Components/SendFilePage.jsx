@@ -72,7 +72,7 @@ const SendFile = () => {
     formData.append("file", blob, `${fileName}.enc`);
 
     try {
-      const response = await fetch("http://localhost:5001/upload", {
+      const response = await fetch("http://18.217.9.56:5001/upload", {
         method: "POST",
         body: formData,
       });
