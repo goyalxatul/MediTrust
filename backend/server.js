@@ -10,6 +10,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.enable('trust proxy');
+
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] === 'http') {
+    // Don't redirect to https, let Cloudflare handle it
+    next();
+  } else {
+    next();
+  }
+});
+
+
 const s3 = new S3Client({
   region: "us-east-2",
   credentials: {
